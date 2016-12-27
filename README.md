@@ -56,6 +56,6 @@ To pick Single contact from Contacts, you can use:
 AVContactPickerController is licensed under the terms of the MIT License, see the included LICENSE file.
 
 
-Authors
+Author
 -------
 - [VinupriyaArivazhagan](https://github.com/VinupriyaArivazhagan/)
