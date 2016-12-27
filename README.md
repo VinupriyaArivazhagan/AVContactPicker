@@ -11,7 +11,7 @@ Download `AVContactPickerController` and add this to your target folder.
 
 ## Usage
 
-Add the following lines to the required class:
+Add the following lines to the required class(`AVContactPickerController` will present from current visible view controller of the `Appdelegate Window` ):
 
 To pick Single contact from Contacts, you can use:
 ```
@@ -38,7 +38,7 @@ To pick Single contact from Contacts, you can use:
  
  <img src="updated.png" alt="normal" width="300"/>
  
- You can get the picked contacts from the delegate `AVContactPickerDelegate`:
+ You can get the picked contacts from the delegate `AVContactPickerDelegate`(need not to assign delegate, delegate will assign to current visible view controller of the `Appdelegate Window`):
  ````
  extension ViewController: AVContactPickerDelegate {
     
