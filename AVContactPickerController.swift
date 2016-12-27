@@ -1,5 +1,5 @@
 //
-//  AVContactViewController.swift
+//  AVContactPickerController.swift
 //  AVContactPicker
 //
 //  Created by Vinupriya Arivazhagan on 12/26/16.
@@ -34,7 +34,7 @@ private struct LocalConstants {
     static let LineBreak = "\n"
 }
 
-protocol AVContactDelegate: class {
+protocol AVContactPickerDelegate: class {
     func pickedContacts(contacts: [Contact])
 }
 
@@ -43,7 +43,7 @@ struct Contact {
     let mobile: String
 }
 
-class AVContactViewController: UIViewController {
+class AVContactPickerController: UIViewController {
 
     let navigationBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: 64))
     
@@ -59,7 +59,7 @@ class AVContactViewController: UIViewController {
     
     let activityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
     
-    weak var delegate: AVContactDelegate?
+    weak var delegate: AVContactPickerDelegate?
     
     var checkImage = "☑".image()
     var uncheckImage = "☐".image()
@@ -121,9 +121,9 @@ class AVContactViewController: UIViewController {
     
     //MARK: - class Function
     
-    class func present(title: String?, maximumContactCount: Int?, updateDesign: ((_ controller: AVContactViewController) -> ())?) {
-        //programmatically creating 'AVContactViewController'
-        let controller = AVContactViewController()
+    class func present(title: String?, maximumContactCount: Int?, updateDesign: ((_ controller: AVContactPickerController) -> ())?) {
+        //programmatically creating 'AVContactPickerController'
+        let controller = AVContactPickerController()
         controller.view = UIView(frame: UIScreen.main.bounds)
         controller.view.backgroundColor = UIColor.white
         
@@ -170,7 +170,7 @@ class AVContactViewController: UIViewController {
         controller.loadingView.addSubview(controller.activityIndicatorView)
         
         
-        if let delegate = UIApplication.shared.delegate?.window??.visibleViewController as? AVContactDelegate {
+        if let delegate = UIApplication.shared.delegate?.window??.visibleViewController as? AVContactPickerDelegate {
             controller.delegate =  delegate
         }
         
@@ -183,7 +183,7 @@ class AVContactViewController: UIViewController {
 
 //MARK: - Contacts
 
-fileprivate extension AVContactViewController {
+fileprivate extension AVContactPickerController {
     
     @available(iOS 9.0, *)
     fileprivate func getAccessGranted() {
@@ -372,7 +372,7 @@ fileprivate extension AVContactViewController {
 
 //MARK: - UITableview Datasource and Delegate extension
 
-extension AVContactViewController: UITableViewDataSource, UITableViewDelegate {
+extension AVContactPickerController: UITableViewDataSource, UITableViewDelegate {
 
     func sectionIndexTitles(for tableView: UITableView) -> [String]? {
         
@@ -519,7 +519,7 @@ extension AVContactViewController: UITableViewDataSource, UITableViewDelegate {
 
 //MARK: - UISearchBar delegate
 
-extension AVContactViewController: UISearchBarDelegate {
+extension AVContactPickerController: UISearchBarDelegate {
 
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         searchBar.becomeFirstResponder()
