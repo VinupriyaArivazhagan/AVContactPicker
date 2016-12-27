@@ -2,6 +2,7 @@
 ===========================
 
 note: supports Xcode 8/Swift 3
+
 Contact picker controller with Contacts framework in Swift 3
 
 ## Getting Started
