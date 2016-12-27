@@ -61,6 +61,8 @@ class AVContactViewController: UIViewController {
     
     weak var delegate: AVContactDelegate?
     
+    var checkImage = "☑".image()
+    var uncheckImage = "☐".image()
     
     fileprivate var maxCount = 1
     
@@ -137,12 +139,17 @@ class AVContactViewController: UIViewController {
         controller.closeButton.addTarget(controller, action: #selector(controller.close(_:)), for: .touchUpInside)
         controller.navigationBar.addSubview(controller.closeButton)
         
-        //setup pick button
-        controller.pickButton.titleLabel?.font = UIFont.systemFont(ofSize: 15)
-        controller.pickButton.setTitle("Pick", for: .normal)
-        controller.pickButton.setTitleColor(UIColor.black, for: .normal)
-        controller.pickButton.addTarget(controller, action: #selector(controller.pickContacts(_:)), for: .touchUpInside)
-        controller.navigationBar.addSubview(controller.pickButton)
+        controller.maxCount = maximumContactCount ?? 1
+
+        if controller.maxCount > 1 {
+            
+            //setup pick button
+            controller.pickButton.titleLabel?.font = UIFont.systemFont(ofSize: 15)
+            controller.pickButton.setTitle("Pick", for: .normal)
+            controller.pickButton.setTitleColor(UIColor.black, for: .normal)
+            controller.pickButton.addTarget(controller, action: #selector(controller.pickContacts(_:)), for: .touchUpInside)
+            controller.navigationBar.addSubview(controller.pickButton)
+        }
         
         //setup 'UISearchBar'
         controller.searchBar.delegate = controller
@@ -162,7 +169,6 @@ class AVContactViewController: UIViewController {
         controller.activityIndicatorView.center = controller.loadingView.center
         controller.loadingView.addSubview(controller.activityIndicatorView)
         
-        controller.maxCount = maximumContactCount ?? 1
         
         if let delegate = UIApplication.shared.delegate?.window??.visibleViewController as? AVContactDelegate {
             controller.delegate =  delegate
@@ -198,7 +204,8 @@ fileprivate extension AVContactViewController {
                     var allContainers: [CNContainer] = []
                     do {
                         allContainers = try contactStore.containers(matching: nil)
-                    } catch {
+                    }
+                    catch {
                         message = LocalConstants.ErrorFetchingContacts
                     }
                     
@@ -211,17 +218,16 @@ fileprivate extension AVContactViewController {
                         do {
                             let containerResults = try contactStore.unifiedContacts(matching: fetchPredicate, keysToFetch: keysToFetch as! [CNKeyDescriptor])
                             contacts.append(contentsOf: containerResults)
-                        } catch {
+                        }
+                        catch {
                             message = LocalConstants.ErrorFetchingContacts
                         }
                     }
                     
-                    if contacts.count != 0
-                    {
+                    if contacts.count != 0 {
                         self.didFetchContacts(contacts)
                     }
-                    else
-                    {
+                    else {
                         message = LocalConstants.ErrorFetchingContacts
                     }
                     
@@ -299,8 +305,7 @@ fileprivate extension AVContactViewController {
                             contactDictionary[LocalConstants.ContactNameKey] = name.trimmingCharacters(in: CharacterSet.whitespaces)
                             contactDictionary[LocalConstants.ContactNumberKey] = value
                             
-                            if let label : String = phoneNumber.label
-                            {
+                            if let label : String = phoneNumber.label {
                                 contactDictionary[LocalConstants.ContactLabelKey] = strongSelf.removeSpecialCharsFromString(label)
                             }
                             strongSelf.contacts.append(contactDictionary)
@@ -313,42 +318,36 @@ fileprivate extension AVContactViewController {
             strongSelf.sectionTitles.removeAll()
             strongSelf.splittedContacts.removeAll()
             
-            for dict in self.contacts
-            {
+            for dict in self.contacts {
                 let name = dict[LocalConstants.ContactNameKey]!
                 
-                if dictContact[name[0].uppercased()] != nil
-                {
+                if dictContact[name[0].uppercased()] != nil {
                     dictContact[name[0].uppercased()]?.append(dict)
                 }
-                else if !strongSelf.indexes.contains(name[0].uppercased())
-                {
-                    if dictContact[LocalConstants.ContactHashKey] != nil
-                    {
+                else if !strongSelf.indexes.contains(name[0].uppercased()) {
+                    
+                    if dictContact[LocalConstants.ContactHashKey] != nil {
                         dictContact[LocalConstants.ContactHashKey]?.append(dict)
                     }
-                    else
-                    {
+                    else {
                         dictContact[LocalConstants.ContactHashKey] = [dict]
                     }
                 }
-                else
-                {
+                else {
                     dictContact[name[0].uppercased()] = [dict]
                 }
             }
             
             strongSelf.sectionTitles = Array(dictContact.keys).sorted(by: <)
             
-            if strongSelf.sectionTitles.count > 0
-            {
-                if strongSelf.sectionTitles[0] == LocalConstants.ContactHashKey
-                {
+            if strongSelf.sectionTitles.count > 0 {
+                if strongSelf.sectionTitles[0] == LocalConstants.ContactHashKey {
                     let indexFirst = strongSelf.sectionTitles[0]
                     strongSelf.sectionTitles.removeFirst()
                     strongSelf.sectionTitles.append(indexFirst)
                 }
             }
+            
             for key in strongSelf.sectionTitles {
                 if let arrSectionContact = dictContact[key] {
                     strongSelf.splittedContacts.append(arrSectionContact)
@@ -357,7 +356,7 @@ fileprivate extension AVContactViewController {
             
             strongSelf.searchedContacts = strongSelf.contacts
             //            weak var weakSelf = self
-            DispatchQueue.main.async{
+            DispatchQueue.main.async {
                 strongSelf.loadingView.isHidden = true
                 strongSelf.activityIndicatorView.stopAnimating()
                 strongSelf.tblView.reloadData()
@@ -431,7 +430,7 @@ extension AVContactViewController: UITableViewDataSource, UITableViewDelegate {
         }
         
         let cell : ContactCell = tableView.dequeueReusableCell(withIdentifier: "ContactCell", for: indexPath) as! ContactCell
-        cell.initialize()
+        cell.initialize(withCheckMarkImage: checkImage)
         
         let value = contactAtIndex[LocalConstants.ContactNumberKey]
         cell.nameLabel.text = contactAtIndex[LocalConstants.ContactNameKey]
@@ -450,10 +449,13 @@ extension AVContactViewController: UITableViewDataSource, UITableViewDelegate {
             
             return false
         }) {
-            cell.checkMarkLabel.text = "☑"
+            cell.checkMarkImageView.image = checkImage
+            cell.checkMarkImageView.adjustImage()
+            
         }
         else {
-            cell.checkMarkLabel.text = "☐"
+            cell.checkMarkImageView.image = uncheckImage
+            cell.checkMarkImageView.adjustImage()
         }
         
         return cell
@@ -471,42 +473,46 @@ extension AVContactViewController: UITableViewDataSource, UITableViewDelegate {
         }
         searchBar.resignFirstResponder()
         
-        let cell : ContactCell = tableView.cellForRow(at: indexPath) as! ContactCell
-        
-        if !pickedContacts.contains(where: { (contact) -> Bool in
-            if contact == [LocalConstants.ContactNameKey : contactAtIndex[LocalConstants.ContactNameKey]!, LocalConstants.ContactPhoneKey : contactAtIndex[LocalConstants.ContactNumberKey]!] {
-                return true
-            }
+        if maxCount > 1 {
+            let cell : ContactCell = tableView.cellForRow(at: indexPath) as! ContactCell
             
-            return false
-        }) {
-            if pickedContacts.count < maxCount
-            {
-                cell.checkMarkLabel.text = "☑"
-                pickedContacts.append([LocalConstants.ContactNameKey : contactAtIndex[LocalConstants.ContactNameKey]!, LocalConstants.ContactPhoneKey : contactAtIndex[LocalConstants.ContactNumberKey]!])
-            }
-            else
-            {
-                cell.shake()
-            }
-        }
-        else
-        {
-            cell.checkMarkLabel.text = "☐"
-            if let index = pickedContacts.index(where: { (contact) -> Bool in
+            if !pickedContacts.contains(where: { (contact) -> Bool in
                 if contact == [LocalConstants.ContactNameKey : contactAtIndex[LocalConstants.ContactNameKey]!, LocalConstants.ContactPhoneKey : contactAtIndex[LocalConstants.ContactNumberKey]!] {
                     return true
                 }
                 
                 return false
             }) {
-                pickedContacts.remove(at: index)
+                if pickedContacts.count < maxCount {
+                    cell.checkMarkImageView.image = checkImage
+                    cell.checkMarkImageView.adjustImage()
+                    pickedContacts.append([LocalConstants.ContactNameKey : contactAtIndex[LocalConstants.ContactNameKey]!, LocalConstants.ContactPhoneKey : contactAtIndex[LocalConstants.ContactNumberKey]!])
+                }
+                else {
+                    cell.shake()
+                }
             }
+            else {
+                cell.checkMarkImageView.image = uncheckImage
+                cell.checkMarkImageView.adjustImage()
+                if let index = pickedContacts.index(where: { (contact) -> Bool in
+                    if contact == [LocalConstants.ContactNameKey : contactAtIndex[LocalConstants.ContactNameKey]!, LocalConstants.ContactPhoneKey : contactAtIndex[LocalConstants.ContactNumberKey]!] {
+                        return true
+                    }
+                    
+                    return false
+                }) {
+                    pickedContacts.remove(at: index)
+                }
+            }
+        }
+        else {
+            dismiss(animated: true, completion: nil)
+            delegate?.pickedContacts(contacts: [Contact(name: contactAtIndex[LocalConstants.ContactNameKey]!, mobile: contactAtIndex[LocalConstants.ContactNumberKey]!)])
         }
     }
     
-    func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView)
-    {
+    func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
         searchBar.resignFirstResponder()
     }
 }
@@ -536,7 +542,8 @@ extension AVContactViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if(searchText.characters.count == 0) {
             searchedContacts = contacts
-        } else {
+        }
+        else {
             let namePredicate = NSPredicate(format: LocalConstants.NamePredicate, searchText)
             let numberPredicate = NSPredicate(format: LocalConstants.NumberPredicate, searchText)
             let resultPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: [namePredicate, numberPredicate])
@@ -550,17 +557,16 @@ extension AVContactViewController: UISearchBarDelegate {
 
 fileprivate class ContactCell: UITableViewCell {
     
-    let checkMarkLabel = UILabel(frame: CGRect(x: 8, y: 12, width: 22, height: 22))
+    let checkMarkImageView = UIImageView(frame: CGRect(x: 8, y: 12, width: 22, height: 22))
     let nameLabel = UILabel(frame: CGRect(x: 45, y: 6, width: UIScreen.main.bounds.size.width-45-8, height: 18))
     let mobileLable = UILabel(frame: CGRect(x: 45, y: 24, width: UIScreen.main.bounds.width-45-8, height: 15))
     
-    func initialize() {
+    func initialize(withCheckMarkImage: UIImage) {
         super.awakeFromNib()
         
-        checkMarkLabel.textColor = UIColor.black
-        checkMarkLabel.text = "☐"
-        checkMarkLabel.font = UIFont.systemFont(ofSize: 15)
-        self.addSubview(checkMarkLabel)
+        checkMarkImageView.image = withCheckMarkImage
+        checkMarkImageView.adjustImage()
+        self.addSubview(checkMarkImageView)
         
         nameLabel.textColor = UIColor.black
         nameLabel.font = UIFont.systemFont(ofSize: 15)
@@ -585,14 +591,27 @@ fileprivate extension UIWindow {
     fileprivate static func getVisibleViewControllerFrom(_ vc: UIViewController?) -> UIViewController? {
         if let nc = vc as? UINavigationController {
             return UIWindow.getVisibleViewControllerFrom(nc.visibleViewController)
-        } else if let tc = vc as? UITabBarController {
+        }
+        else if let tc = vc as? UITabBarController {
             return UIWindow.getVisibleViewControllerFrom(tc.selectedViewController)
-        } else {
+        }
+        else {
             if let pvc = vc?.presentedViewController {
                 return UIWindow.getVisibleViewControllerFrom(pvc)
-            } else {
+            }
+            else {
                 return vc
             }
+        }
+    }
+}
+
+fileprivate extension UIImageView {
+    
+    fileprivate func adjustImage() {
+        self.sizeToFit()
+        if self.frame.size.width > 22 {
+            self.frame = CGRect(x: self.frame.origin.x, y: self.frame.origin.y, width: 22, height: 22)
         }
     }
 }
@@ -601,6 +620,23 @@ fileprivate extension String {
     
     fileprivate subscript (i: Int) -> String {
         return String(self[self.characters.index(self.startIndex, offsetBy: i)])
+    }
+    
+    func image() -> UIImage {
+        let size = CGSize(width: 22, height: 22)
+        UIGraphicsBeginImageContextWithOptions(size, false, 1);
+        UIColor.clear.set()
+        let rect = CGRect(origin: CGPoint.zero, size: size)
+        UIRectFill(CGRect(origin: CGPoint.zero, size: size))
+        (self as NSString).draw(in: rect, withAttributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 20)])
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        if let image = image {
+            return image
+        }
+        else {
+            return UIImage()
+        }
     }
 }
 
