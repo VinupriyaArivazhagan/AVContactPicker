@@ -38,6 +38,19 @@ To pick Single contact from Contacts, you can use:
  
  <img src="updated.png" alt="normal" width="300"/>
  
+ You can get the picked contacts from the delegate `AVContactPickerDelegate`:
+ ````
+ extension ViewController: AVContactPickerDelegate {
+    
+    func pickedContacts(contacts: [Contact]) {
+        for contact in contacts {
+            print("\(contact.name), \(contact.mobile)")
+        }
+    }
+}
+``````
+
+ 
  License
 -------
 Pusher is licensed under the terms of the MIT License, see the included LICENSE file.
