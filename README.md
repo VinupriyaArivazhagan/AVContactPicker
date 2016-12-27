@@ -58,4 +58,4 @@ AVContactPickerController is licensed under the terms of the MIT License, see th
 
 Author
 -------
-- [VinupriyaArivazhagan](https://github.com/VinupriyaArivazhagan/)
+- [VinupriyaArivazhagan](https://genericswift.wordpress.com/)
