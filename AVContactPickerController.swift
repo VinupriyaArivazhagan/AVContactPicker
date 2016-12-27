@@ -623,20 +623,14 @@ fileprivate extension String {
     }
     
     func image() -> UIImage {
-        let size = CGSize(width: 22, height: 22)
-        UIGraphicsBeginImageContextWithOptions(size, false, 1);
-        UIColor.clear.set()
-        let rect = CGRect(origin: CGPoint.zero, size: size)
-        UIRectFill(CGRect(origin: CGPoint.zero, size: size))
-        (self as NSString).draw(in: rect, withAttributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 20)])
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        if let image = image {
-            return image
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 22, height: 22))
+        
+        let image = renderer.image { ctx in
+            let rect = CGRect(origin: CGPoint.zero, size: CGSize(width: 22, height: 22))
+            (self as NSString).draw(in: rect, withAttributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 22)])
         }
-        else {
-            return UIImage()
-        }
+        
+        return image
     }
 }
 
