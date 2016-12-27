@@ -53,7 +53,7 @@ To pick Single contact from Contacts, you can use:
  
  License
 -------
-Pusher is licensed under the terms of the MIT License, see the included LICENSE file.
+AVContactPickerController is licensed under the terms of the MIT License, see the included LICENSE file.
 
 
 Authors
