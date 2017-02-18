@@ -29,8 +29,8 @@ To pick Single contact from Contacts, you can use:
  ```
  AVContactPickerController.present(title: "Contact", maximumContactCount: 2, updateDesign: { controller in
             
-            controller.checkImage = #imageLiteral(resourceName: "Clicked")
-            controller.uncheckImage = #imageLiteral(resourceName: "Click")
+            controller.checkImage = #imageLiteral(resourceName: "check")
+            controller.uncheckImage = #imageLiteral(resourceName: "uncheck")
             controller.closeButton.setTitleColor(UIColor.red, for: .normal)
         })
  ```
