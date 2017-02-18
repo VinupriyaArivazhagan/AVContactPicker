@@ -36,7 +36,7 @@ To pick Single contact from Contacts, you can use:
  ```
  You can change `checkImage` and `uncheckImage`.
  
- <img src="updated.png" alt="normal" width="300"/>
+ <img src="updated2.png" alt="normal" width="300"/>
  
  You can get the picked contacts from the delegate `AVContactPickerDelegate`(need not to assign delegate, delegate will assign to current visible view controller of the `Appdelegate Window`):
  ````
